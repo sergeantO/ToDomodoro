@@ -2,10 +2,11 @@
   div
     timmer(
       v-if="taskStarted != null"
-      :WORKTIME="config.WORKTIME",
+      :WORKTIME="config.WORKTIME - timeLeft",
       :RELAXTIME="config.RELAXTIME",
       :currTask='taskStarted',
       @currTaskClosed='currTaskClose',
+      @addTask='addTask'
       @currTaskIsDone='currTaskDone')
     taskList(
       v-else,
@@ -26,6 +27,7 @@ export default {
   },
   data () {
     return {
+      timeLeft: 0,
       tasks: [],
       report: {},
       taskStarted: null
@@ -66,14 +68,27 @@ export default {
         return 0
       })
     },
+    addTask (e) {
+      this.taskStarted.completed = true
+      this.timeLeft += e
+      this.taskStarted.totalTime += e
+      this.addReport(e)
+      this.taskStarted = null
+      this.saveTasks()
+    },
     currTaskDone () {
       this.taskStarted.completed = true
       this.currTaskClose()
     },
     currTaskClose () {
-      let totalTimeToTask = this.config.WORKTIME + this.config.RELAXTIME
+      let totalTimeToTask = this.config.WORKTIME - this.timeLeft + this.config.RELAXTIME
       this.taskStarted.totalTime += totalTimeToTask
-
+      this.addReport(totalTimeToTask)
+      this.taskStarted = null
+      this.saveTasks()
+      this.timeLeft = 0
+    },
+    addReport (totalTimeToTask) {
       let title = this.taskStarted.title
       let today = this.formatDate()
       if (this.report[today] === undefined) {
@@ -86,9 +101,6 @@ export default {
           this.report[today][title] = this.report[today][title] + totalTimeToTask
         }
       }
-
-      this.taskStarted = null
-      this.saveTasks()
     },
     formatDate () {
       let date = new Date()

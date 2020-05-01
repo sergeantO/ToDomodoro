@@ -51,17 +51,13 @@ export default {
 
 .button {
     display: inline-block;
+    vertical-align: middle;
     text-align: center;
     line-height: 1;
     cursor: pointer;
-    -webkit-appearance: none;
-    -webkit-transition: background-color .25s ease-out,color .25s ease-out;
-    transition: background-color .25s ease-out,color .25s ease-out;
-    vertical-align: middle;
-    border: 1px solid transparent;
-    border-radius: 0;
+    border: none;
     padding: .85em 1em;
-    font-size: .9rem;
+    font-size: 1rem;
     background-color: #2199e8;
     color: #fefefe;
 }

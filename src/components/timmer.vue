@@ -6,17 +6,19 @@ transition(name='bounce')
         g.base-timer__circle
           circle.base-timer__path-elapsed(cx='50', cy='50', r='45')
           path#base-timer-path-remaining.base-timer__path-remaining(:stroke-dasharray='circleDasharray', d='\
-          M 50, 50\
-          m -45, 0\
-          a 45,45 0 1,0 90,0\
-          a 45,45 0 1,0 -90,0\
+            M 50, 50\
+            m -45, 0\
+            a 45,45 0 1,0 90,0\
+            a 45,45 0 1,0 -90,0\
           ')
       p#base-timer-label.base-timer__label
         span  {{ currtime }}
         span.base-timer__label__small  / {{ alltime }}
     div.info(v-if='currTask')
       h2 {{currTask.title}}
-      h3(v-if='!timeIsOver') {{ status }}
+      div(v-if='!timeIsOver')
+        h3 {{ status }}
+        button.taskdone(v-if="status=='Работаем'" @click="$emit('addTask', TIME_LIMIT-timeLeft)") Добавить задачу
       div(v-else)
         button.taskdone(@click="stopTask") Задача выполнена
         button.taskclose(@click="$emit('currTaskClosed')") Задача требует доработки
@@ -38,6 +40,17 @@ export default {
     }
   },
   methods: {
+    startTask () {
+      this.status = 'Работаем'
+      this.start(this.WORKTIME)
+        .then(() => {
+          this.status = 'Отдыхаем'
+          return this.start(this.RELAXTIME)
+        })
+        .then(() => {
+          this.timeIsOver = true
+        })
+    },
     stopTask () {
       clearInterval(this.timerInterval)
       this.$emit('currTaskIsDone')
@@ -57,7 +70,7 @@ export default {
         }, 1000)
       })
     },
-    time (sec) {
+    timeFormating (sec) {
       const minutes = Math.floor(sec / 60)
       let seconds = sec % 60
       if (seconds < 10) {
@@ -68,10 +81,10 @@ export default {
   },
   computed: {
     currtime () {
-      return this.time(this.timeLeft)
+      return this.timeFormating(this.timeLeft)
     },
     alltime () {
-      return this.time(this.TIME_LIMIT)
+      return this.timeFormating(this.TIME_LIMIT)
     },
     circleDasharray () {
       let rawTimeFraction = this.timeLeft / this.TIME_LIMIT
@@ -80,38 +93,21 @@ export default {
     }
   },
   mounted () {
-    this.status = 'Работаем'
-    this.start(this.WORKTIME)
-      .then(() => {
-        this.status = 'Отдыхаем'
-        return this.start(this.RELAXTIME)
-      })
-      .then(() => {
-        this.timeIsOver = true
-      })
+    this.startTask()
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .timer{
-  z-index: 1;
   font-family: sans-serif;
-  box-shadow: 0px 0.25rem 1rem rgba(0,0,0,0.25);
-  border: 1px solid #d2d1d1;
   width: 95%;
-  padding: 1rem;
-  position: absolute;
-  top: 50%;
-  margin: 0 auto;
-  box-shadow: none;
-  border: none;
-  transform: translateY(-60%);
+  margin: 7rem auto;
 }
 .base-timer {
   position: relative;
-  max-width: 400px;
-  max-height: 400px;
+  max-width: 25rem;
+  max-height: 25rem;
   margin: 0 auto;
 }
 .base-timer__svg {
@@ -150,7 +146,6 @@ export default {
 .base-timer__label__small{
   font-size: 20px;
   color: gray;
-  display:block;
 }
 @media (max-width: 195px) {
   .base-timer__label {
@@ -158,12 +153,12 @@ export default {
   }
 }
 .info{
-  margin-top: 3rem;
+  margin: 3rem;
 }
 
 button{
-  margin: 15px;
-  padding: 15px 25px;
+  margin: 1rem;
+  padding: 1em 1.3em;
   border: 1px solid black;
   border-radius: 5px;
 }

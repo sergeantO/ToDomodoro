@@ -1,11 +1,17 @@
 <template lang="pug">
-table
-  tr
-    th(v-for="header in headers") {{ header }}
-  tr(v-for="row in rows")
-    td(v-for="col in row") {{ col }}
-  tr
-    th(v-for="i in info") {{ i }}
+div.reporting
+  div.row
+    p С
+    input(type="date")
+    p ДО
+    input(type="date")
+  table
+    tr
+      th(v-for="header in headers") {{ header }}
+    tr(v-for="row in rows")
+      td(v-for="col in row") {{ col }}
+    tr
+      th(v-for="i in tableFooter") {{ i }}
 </template>
 
 <script>
@@ -24,10 +30,6 @@ export default {
         localStorage.removeItem('report')
       }
     }
-    console.log(this.timeFormating(600))
-    console.log(this.timeFormating(1800))
-    console.log(this.timeFormating(3600))
-    console.log(this.timeFormating(3800))
   },
   methods: {
     timeFormating (sec) {
@@ -36,20 +38,20 @@ export default {
     }
   },
   computed: {
-    info () {
-      let headers = []
+    tableFooter () {
+      let footer = []
       for (let key in this.report) {
         let totalForDay = 0
         for (let time in this.report[key]) {
           totalForDay += this.report[key][time]
         }
-        headers.push(totalForDay)
+        footer.push(totalForDay)
       }
       return [
         '',
         'Итого',
-        this.timeFormating(headers.reduce((ac, x) => ac + x, 0)),
-        ...headers.map(x => this.timeFormating(x))
+        this.timeFormating(footer.reduce((ac, x) => ac + x, 0)),
+        ...footer.map(x => this.timeFormating(x))
       ]
     },
     headers () {
@@ -62,9 +64,10 @@ export default {
     rows () {
       let rows = []
       let tasks = []
+      let days = this.report
 
-      for (let day in this.report) {
-        for (let taskName in this.report[day]) {
+      for (let day in days) {
+        for (let taskName in days[day]) {
           if (!tasks.includes(taskName)) {
             tasks.push(taskName)
           }
@@ -77,16 +80,21 @@ export default {
         let totalForTask = 0
 
         let row = []
-        for (let day in this.report) {
-          if (this.report[day][taskName] === undefined) {
+        for (let day in days) {
+          if (days[day][taskName] === undefined) {
             row.push('')
           } else {
-            row.push(this.report[day][taskName])
+            row.push(days[day][taskName])
             totalForTask += this.report[day][taskName]
           }
         }
 
-        rows.push([index++, taskName, this.timeFormating(totalForTask), ...row.map(x => this.timeFormating(x))])
+        rows.push([
+          index++,
+          taskName,
+          this.timeFormating(totalForTask),
+          ...row.map(x => this.timeFormating(x))
+        ])
       }
 
       return rows
@@ -96,6 +104,20 @@ export default {
 </script>
 
 <style lang="scss">
+.row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+
+  input, p {
+    margin: 1rem;
+    padding: .5rem;
+  }
+  button {
+    margin-top: 2rem;
+  }
+}
 table {
   margin: 2rem;
   border-collapse: collapse;

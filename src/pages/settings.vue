@@ -1,19 +1,19 @@
 <template lang="pug">
 div.setting
-  div
+  div.row
     p Работа(сек)
     input(
       type='number',
       v-model.number='config.WORKTIME',
     )
-  div
+  div.row
     p Отдых(сек)
     input(
       type='number',
       v-model.number='config.RELAXTIME',
     )
-  div
-    button.button(@click="save") Save
+  div.row
+    button.button(@click="save") Сохранить
 </template>
 
 <script>
@@ -37,13 +37,20 @@ export default {
   margin: 1rem;
   display: flex;
   flex-wrap: wrap;
+}
 
-  div {
-    width: 100%;
-    * {
-      margin: .75rem;
-      padding: .5rem;
-    }
+.row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+
+  input, p {
+    margin: 1rem;
+    padding: .5rem;
+  }
+  button {
+    margin-top: 2rem;
   }
 }
 </style>

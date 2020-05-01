@@ -39,12 +39,24 @@ export default {
   methods: {
     addTask () {
       if (this.newTaskTitle) {
+        let lastTaskID = 0
+        if (localStorage.getItem('lastTaskID')) {
+          try {
+            lastTaskID = JSON.parse(localStorage.getItem('lastTaskID'))
+          } catch (e) {
+            localStorage.removeItem('lastTaskID')
+          }
+        }
+
         this.tasks.push({
+          id: lastTaskID++,
           title: this.newTaskTitle,
           completed: false,
           totalTime: 0
         })
+
         this.newTaskTitle = ''
+        localStorage.setItem('lastTaskID', JSON.stringify(lastTaskID))
       }
       this.$emit('taskListChanged')
     },

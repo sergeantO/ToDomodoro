@@ -28,7 +28,7 @@ export default {
     padding: 10px;
 }
 .router-link-exact-active {
-    background-color: rgba(0,128,0,0.15);
-    border-bottom: 2px solid rgba(0,128,0,0.2);
+    // background-color: rgba(0,128,0,0.15);
+    border-bottom: 3px solid rgba(0,128,0,0.2);
 }
 </style>

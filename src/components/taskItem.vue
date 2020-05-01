@@ -1,8 +1,9 @@
 <template lang="pug">
 li.tasks__item
-  button(:class='className', @click.self="selectTask")
+  div(:class='className')
     span {{ task.title }}
     b {{ timeFormating (task.totalTime) }}
+  button.tasks__item__remove.button.play.pull-right(@click.self="selectTask") P
   button.tasks__item__remove.button.alert.pull-right(@click="$emit('remove')")
     i.fa.fa-timeFormatings
 </template>
@@ -43,24 +44,28 @@ export default {
 
 <style lang="scss" scope>
 .tasks__item {
-    margin-bottom: 0.5em;
     display: flex;
     justify-content: space-between;
 }
 .tasks__item__toggle {
-    cursor: pointer;
+    // cursor: pointer;
     width: 100%;
     padding: 0.85em 1em;
     background-color: rgba(0,0,0,0.05);
     border: 1px solid rgba(0,0,0,0.1);
     display: flex;
     justify-content: space-between;
+    font-size: .9rem;
 }
 .tasks__item__remove {
     height: 100%;
 }
 .button.alert {
     background-color: #ec5840;
+    color: #fefefe;
+}
+.button.play {
+    background-color: rgb(65, 184, 131);
     color: #fefefe;
 }
 .pull-right {
