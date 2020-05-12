@@ -6,14 +6,27 @@ transition(name='bounce')
         type='text',
         placeholder='Новая задача',
         v-model='newTaskTitle',
-        @keyup.enter='addTask'
+        @keyup.enter="addTask('work')"
       )
       span.input-group-button
-        button.button(@click='addTask')
-          i.fa.fa-plus Добавить
+        button.button(@click="addTask('work')")
+          i.fa.fa-plus Рабочая
+      span.input-group-button
+        button.button(@click="addTask('personal')")
+          i.fa.fa-plus Личная
+    div.row
+      div.tasksTypes
+        input(type='radio', value='personal', v-model='selectedTasksType')
+        label Личные задачи
+      div.tasksTypes
+        input(type='radio', value='work', v-model='selectedTasksType')
+        label Рабочие задачи
+      div.tasksTypes
+        input(type='radio', value='all', v-model='selectedTasksType')
+        label Все
     ul.tasks__list.no-bullet
       taskItem(
-        v-for='(task, index) in tasks',
+        v-for='(task, index) in taskList',
         @remove='removeTask(index)',
         @select='selectTask(task)',
         :task='task',
@@ -33,11 +46,22 @@ export default {
   },
   data () {
     return {
-      newTaskTitle: ''
+      newTaskTitle: '',
+      selectedTasksType: 'all'
+    }
+  },
+  computed: {
+    taskList () {
+      if (this.selectedTasksType === 'all') {
+        return this.tasks
+      } else {
+        return this.tasks
+          .filter(task => task.category === this.selectedTasksType)
+      }
     }
   },
   methods: {
-    addTask () {
+    addTask (category) {
       if (this.newTaskTitle) {
         let lastTaskID = 0
         if (localStorage.getItem('lastTaskID')) {
@@ -52,7 +76,8 @@ export default {
           id: lastTaskID++,
           title: this.newTaskTitle,
           completed: false,
-          totalTime: 0
+          totalTime: 0,
+          category
         })
 
         this.newTaskTitle = ''
@@ -76,6 +101,9 @@ export default {
   width: 100%;
   padding: 1em;
   margin: 1rem auto;
+}
+.tasksTypes {
+  padding: 10px;
 }
 .input-group-field{
   text-align: center;
