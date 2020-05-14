@@ -1,29 +1,23 @@
 <template lang="pug">
 transition(name='bounce')
   section.tasks
+    div.row
+      div.tasksTypes(v-for='cat in categories')
+        input(type='radio', :value='cat.alias', v-model='selectedTasksType')
+        label {{ cat.category }}
     .tasks__new.input-group
       input.input-group-field(
         type='text',
         placeholder='Новая задача',
         v-model='newTaskTitle',
-        @keyup.enter="addTask('work')"
+        @keyup.enter='addTask'
       )
-      span.input-group-button
-        button.button(@click="addTask('work')")
-          i.fa.fa-plus Рабочая
-      span.input-group-button
-        button.button(@click="addTask('personal')")
-          i.fa.fa-plus Личная
-    div.row
-      div.tasksTypes
-        input(type='radio', value='personal', v-model='selectedTasksType')
-        label Личные задачи
-      div.tasksTypes
-        input(type='radio', value='work', v-model='selectedTasksType')
-        label Рабочие задачи
-      div.tasksTypes
-        input(type='radio', value='all', v-model='selectedTasksType')
-        label Все
+      input.input-group-field(
+        type='text',
+        placeholder='Новая категория',
+        v-model='newCategory',
+        @keyup.enter='addCategory'
+      )
     ul.tasks__list.no-bullet
       taskItem(
         v-for='(task, index) in taskList',
@@ -47,7 +41,18 @@ export default {
   data () {
     return {
       newTaskTitle: '',
-      selectedTasksType: 'all'
+      newCategory: '',
+      selectedTasksType: 'work',
+      categories: [
+        {
+          category: 'Рабочие задачи',
+          alias: 'work'
+        },
+        {
+          category: 'Личные задачи',
+          alias: 'personal'
+        }
+      ]
     }
   },
   computed: {
@@ -60,8 +65,26 @@ export default {
       }
     }
   },
+  mounted () {
+    if (localStorage.getItem('categories')) {
+      try {
+        this.categories = JSON.parse(localStorage.getItem('categories'))
+      } catch (e) {
+        localStorage.removeItem('categories')
+      }
+    }
+  },
   methods: {
-    addTask (category) {
+    addCategory () {
+      this.categories.push(
+        {
+          category: this.newCategory,
+          alias: this.rus_to_latin(this.newCategory)
+        })
+      this.newCategory = ''
+      localStorage.setItem('categories', JSON.stringify(this.categories))
+    },
+    addTask () {
       if (this.newTaskTitle) {
         let lastTaskID = 0
         if (localStorage.getItem('lastTaskID')) {
@@ -77,7 +100,7 @@ export default {
           title: this.newTaskTitle,
           completed: false,
           totalTime: 0,
-          category
+          category: this.selectedTasksType
         })
 
         this.newTaskTitle = ''
@@ -91,6 +114,16 @@ export default {
     removeTask (index) {
       this.tasks.splice(index, 1)
       this.$emit('taskListChanged')
+    },
+    rus_to_latin (str) {
+      let ru = {
+        ' ': '_', 'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'j', 'з': 'z', 'и': 'i', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'c', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ы': 'y', 'э': 'e', 'ю': 'u', 'я': 'ya'
+      }
+
+      return str
+        .split('')
+        .map(x => ru[x] || x)
+        .join('')
     }
   }
 }
@@ -99,8 +132,7 @@ export default {
 <style lang="scss" scoped>
 .tasks{
   width: 100%;
-  padding: 1em;
-  margin: 1rem auto;
+  padding: 0 1em;
 }
 .tasksTypes {
   padding: 10px;
@@ -111,6 +143,7 @@ export default {
   border:none;
   border-bottom: 2px solid rgba(0,0,0,0.1);
   padding: .85em 1em;
+  margin: 0 2px;
   flex-grow: 1;
 }
 .input-group {
