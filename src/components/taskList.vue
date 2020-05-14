@@ -1,10 +1,10 @@
 <template lang="pug">
 transition(name='bounce')
   section.tasks
-    div.row
+    div.row.wrap
       div.tasksTypes(v-for='cat in categories')
-        input(type='radio', :value='cat.alias', v-model='selectedTasksType')
-        label {{ cat.category }}
+        input(type='radio', :id='cat.alias', :value='cat.alias', v-model='selectedTasksType')
+        label(:for='cat.alias') {{ cat.category }}
     .tasks__new.input-group
       input.input-group-field(
         type='text',
@@ -13,6 +13,7 @@ transition(name='bounce')
         @keyup.enter='addTask'
       )
       input.input-group-field(
+        v-if="selectedTasksType !== 'all'"
         type='text',
         placeholder='Новая категория',
         v-model='newCategory',
@@ -44,6 +45,10 @@ export default {
       newCategory: '',
       selectedTasksType: 'work',
       categories: [
+        {
+          category: 'Все',
+          alias: 'all'
+        },
         {
           category: 'Рабочие задачи',
           alias: 'work'
@@ -130,12 +135,40 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.wrap {
+  flex-wrap: wrap;
+}
 .tasks{
   width: 100%;
   padding: 0 1em;
 }
 .tasksTypes {
-  padding: 10px;
+  label {
+    display: inline-block;
+    cursor: pointer;
+    padding: 0px 15px;
+    line-height: 34px;
+    border: 2px solid #999;
+    border-radius: 6px;
+    user-select: none;
+  }
+  input[type=radio] {
+    display: none;
+  }
+
+  input[type=radio]:checked + label {
+    background: #2199e8;
+    border: 2px solid #0954e0;
+  }
+
+  label:hover {
+    color: #666;
+  }
+
+  input[type=radio]:disabled + label {
+    background: #efefef;
+    color: #666;
+  }
 }
 .input-group-field{
   text-align: center;

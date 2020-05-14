@@ -44,6 +44,7 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+  padding: .5rem;
 
   input, p {
     margin: 1rem;
