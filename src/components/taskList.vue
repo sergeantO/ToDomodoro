@@ -5,19 +5,20 @@ transition(name='bounce')
       div.tasksTypes(v-for='cat in categories')
         input(type='radio', :id='cat.alias', :value='cat.alias', v-model='selectedTasksType')
         label(:for='cat.alias') {{ cat.category }}
+      div.tasksTypes
+        input.input-group-field(
+          type='text',
+          placeholder='Новая категория',
+          v-model='newCategory',
+          @keyup.enter='addCategory'
+        )
     .tasks__new.input-group
-      input.input-group-field(
-        type='text',
-        placeholder='Новая задача',
-        v-model='newTaskTitle',
-        @keyup.enter='addTask'
-      )
       input.input-group-field(
         v-if="selectedTasksType !== 'all'"
         type='text',
-        placeholder='Новая категория',
-        v-model='newCategory',
-        @keyup.enter='addCategory'
+        placeholder='Новая задача в категории',
+        v-model='newTaskTitle',
+        @keyup.enter='addTask'
       )
     ul.tasks__list.no-bullet
       taskItem(
@@ -43,7 +44,7 @@ export default {
     return {
       newTaskTitle: '',
       newCategory: '',
-      selectedTasksType: 'work',
+      selectedTasksType: 'all',
       categories: [
         {
           category: 'Все',
@@ -125,7 +126,7 @@ export default {
         ' ': '_', 'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'j', 'з': 'z', 'и': 'i', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'c', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ы': 'y', 'э': 'e', 'ю': 'u', 'я': 'ya'
       }
 
-      return str
+      return str.toLowerCase()
         .split('')
         .map(x => ru[x] || x)
         .join('')
