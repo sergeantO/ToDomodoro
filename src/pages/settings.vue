@@ -1,19 +1,19 @@
 <template lang="pug">
 div.setting
   div.row
-    p Работа(сек)
+    p Работа (мин)
     input(
       type='number',
-      v-model.number='config.WORKTIME',
+      v-model.number='workmin',
+      @change = "save"
     )
   div.row
-    p Отдых(сек)
+    p Отдых (мин)
     input(
       type='number',
-      v-model.number='config.RELAXTIME',
+      v-model.number='relaxmin',
+      @change = "save"
     )
-  div.row
-    button.button(@click="save") Сохранить
 </template>
 
 <script>
@@ -22,10 +22,19 @@ export default {
   props: ['config'],
   data () {
     return {
+      workmin: 0,
+      relaxmin: 0
     }
+  },
+  mounted () {
+    this.workmin = this.config.WORKTIME / 60
+    this.relaxmin = this.config.RELAXTIME / 60
   },
   methods: {
     save () {
+      this.config.WORKTIME = this.workmin * 60
+      this.config.RELAXTIME = this.relaxmin * 60
+
       localStorage.setItem('setting', JSON.stringify(this.config))
     }
   }
