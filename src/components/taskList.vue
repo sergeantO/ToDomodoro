@@ -2,8 +2,13 @@
 transition(name='bounce')
   section.tasks
     div.row.wrap
-      div.tasksTypes(v-for='cat in categories')
-        input(type='radio', :id='cat.alias', :value='cat.alias', v-model='selectedTasksType')
+      div.tasksTypes(v-for='cat in categories' )
+        input(
+          type='radio'
+          :id='cat.alias'
+          :value='cat.alias'
+          v-model='selectedTasksType'
+        )
         label(:for='cat.alias') {{ cat.category }}
       div.tasksTypes
         input.input-group-field(
@@ -82,11 +87,10 @@ export default {
   },
   methods: {
     addCategory () {
-      this.categories.push(
-        {
-          category: this.newCategory,
-          alias: this.rus_to_latin(this.newCategory)
-        })
+      this.categories.push({
+        category: this.newCategory,
+        alias: this.rus_to_latin(this.newCategory)
+      })
       this.newCategory = ''
       localStorage.setItem('categories', JSON.stringify(this.categories))
     },
@@ -149,8 +153,7 @@ export default {
     cursor: pointer;
     padding: 0px 15px;
     line-height: 34px;
-    border: 2px solid #999;
-    border-radius: 6px;
+    border-bottom: 2px solid #999;
     user-select: none;
   }
   input[type=radio] {
@@ -158,8 +161,8 @@ export default {
   }
 
   input[type=radio]:checked + label {
-    background: #2199e8;
-    border: 2px solid #0954e0;
+    background-color: rgba(#0954e0,0.05);
+    border-bottom: 2px solid #0954e0;
   }
 
   label:hover {
@@ -173,9 +176,9 @@ export default {
 }
 .input-group-field{
   text-align: center;
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(#0954e0,0.05);
   border:none;
-  border-bottom: 2px solid rgba(0,0,0,0.1);
+  border-bottom: 2px solid #0954e0;
   padding: .85em 1em;
   margin: 0 2px;
   flex-grow: 1;
