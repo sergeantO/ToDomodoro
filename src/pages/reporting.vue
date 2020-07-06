@@ -2,15 +2,20 @@
 div.reporting
   div.row
     p С
-    input(type="date")
+    input(type="date" v-model="from")
     p ДО
-    input(type="date")
+    input(type="date" v-model="to")
+    button(@click = "clearDate") Сброс дат
   table
     tr
+      th #
+      th Задача
+      th Общее время
       th(v-for="header in headers") {{ header }}
     tr(v-for="row in rows")
       td(v-for="col in row") {{ col }}
     tr
+      th(colspan="2") Итого
       th(v-for="i in tableFooter") {{ i }}
 </template>
 
@@ -19,13 +24,15 @@ export default {
   name: 'Reporting',
   data () {
     return {
-      report: {}
+      from: '',
+      to: '',
+      rawReport: {}
     }
   },
   mounted () {
     if (localStorage.getItem('report')) {
       try {
-        this.report = JSON.parse(localStorage.getItem('report'))
+        this.rawReport = JSON.parse(localStorage.getItem('report'))
       } catch (e) {
         localStorage.removeItem('report')
       }
@@ -35,11 +42,38 @@ export default {
     timeFormating (sec) {
       const hours = Math.round(sec / 360) / 10
       return hours
+    },
+    clearDate () {
+      this.from = ''
+      this.to = ''
     }
   },
   computed: {
+    report () {
+      if (this.from === '' && this.to === '') {
+        return this.rawReport
+      }
+
+      let result = {}
+      const from = new Date(this.from)
+      const to = new Date(this.to)
+
+      for (let key in this.rawReport) {
+        let ddmmyy = key.split('.')
+        let day = new Date('20' + ddmmyy[2], ddmmyy[1] - 1, ddmmyy[0])
+
+        if (day < from || day > to) {
+          continue
+        }
+
+        result[key] = this.rawReport[key]
+      }
+
+      return result
+    },
     tableFooter () {
       let footer = []
+
       for (let key in this.report) {
         let totalForDay = 0
         for (let time in this.report[key]) {
@@ -47,15 +81,14 @@ export default {
         }
         footer.push(totalForDay)
       }
+
       return [
-        '',
-        'Итого',
         this.timeFormating(footer.reduce((ac, x) => ac + x, 0)),
         ...footer.map(x => this.timeFormating(x))
       ]
     },
     headers () {
-      let headers = ['#', 'Задача', 'Общее время']
+      let headers = []
       for (let key in this.report) {
         headers.push(key)
       }
