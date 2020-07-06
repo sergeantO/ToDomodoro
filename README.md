@@ -2,6 +2,9 @@
 
 > A Vue.js project
 
+## Link 2 Use
+https://sergeanto.github.io/ToDomodoro/
+
 ## Build Setup
 
 ``` bash
